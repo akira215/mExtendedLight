@@ -1,0 +1,11 @@
+menu "Project Settings"
+    
+    orsource "$IDF_PATH/examples/common_components/env_caps/$IDF_TARGET/Kconfig.env_caps"
+
+    rsource "./Kconfig.main"
+    rsource "./../components/matter/Kconfig.matter"
+
+    comment "Module Debugging"
+
+    
+endmenu

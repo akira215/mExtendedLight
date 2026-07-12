@@ -1,0 +1,19 @@
+
+menu "Pin layout"
+    config PIN_LED
+        int "On Board LED GPIO Num WS2812B"
+        range ENV_GPIO_RANGE_MIN ENV_GPIO_OUT_RANGE_MAX
+        default 8
+        help
+            GPIO number for Led that App will use as UI.
+    
+    config PIN_BUTTON
+        int "On Board Button GPIO Num"
+        range ENV_GPIO_RANGE_MIN ENV_GPIO_OUT_RANGE_MAX
+        default 9
+        help
+            GPIO number for the button that App will use as UI.
+    
+endmenu
+
+
