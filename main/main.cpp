@@ -136,7 +136,7 @@ void Main::setup(void)
 
 
     // Pass the SDK create function. The wrapper deduces the config type automatically.
-    _light = App.getNode()->createEndpoint(light_config);
+    _light = App.getNode()->createEndpoint(&light_config);
     ESP_LOGE(TAG, "Akira Light created with endpoint_id %d", _light->getEndpointId());
 
     _light->registerIdentifyHandler(&Main::identifyHandler, this);
@@ -167,6 +167,53 @@ void Main::setup(void)
 
     MatterAttribute* attrHue = clusterColorControl->getAttribute(ATTRIBUTE_ID(ColorControl, CurrentHue));
     MatterAttribute* attrSaturation = clusterColorControl->getAttribute(ATTRIBUTE_ID(ColorControl, CurrentSaturation));
+
+
+    // Assuming 'endpoint' is your newly created endpoint pointer
+    // 1. Create a Fixed Label Cluster (for permanent vendor tags)
+
+    /*
+    esp_matter::cluster::fixed_label::config_t fl_config;
+    //esp_matter::cluster_t *fl_cluster = esp_matter::cluster::fixed_label::create(endpoint, &fl_config, CLUSTER_FLAG_SERVER);
+    _light->createCluster(&fl_config, esp_matter::CLUSTER_FLAG_SERVER);
+    */
+
+    // 2. Create a User Label Cluster (for user-reconfigurable tags)
+    esp_matter::cluster::user_label::adl_config_t ul_config;
+    _light->createCluster(&ul_config, esp_matter::CLUSTER_FLAG_SERVER);
+    //esp_matter::cluster_t *ul_cluster = esp_matter::cluster::user_label::create(endpoint, &ul_config, CLUSTER_FLAG_SERVER);
+
+     // Crucial: Matter limits both label and value strings to exactly 16 characters max
+    const char* default_label = "room";
+    const char* default_value = "Unassigned";
+
+    // 3. Construct a standard Matter/CHIP LabelStruct entry
+    // This utilizes the underlying project-chip architecture embedded in ESP-Matter
+    chip_cluster::UserLabel::Structs::LabelStruct::Type custom_label;
+    custom_label.label = chip::CharSpan(default_label, strlen(default_label));
+    custom_label.value = chip::CharSpan(default_value, strlen(default_value));
+
+    // 4. Wrap it into an iterable array container (UserLabel dictates a List)
+    // For a simple single default label, we allocate an array of size 1
+    chip_cluster::UserLabel::Structs::LabelStruct::Type label_list_array[1];
+    label_list_array[0] = custom_label;
+
+    // 5. Wrap your native structure array into an ESP-Matter generic attribute value wrapper
+    esp_matter_attr_val_t initial_val;
+    initial_val.type = ESP_MATTER_VAL_TYPE_ARRAY;
+    initial_val.val.a.b = (uint8_t *)label_list_array;
+    initial_val.val.a.s = sizeof(label_list_array);
+
+
+    esp_matter::attribute::update(
+        _light->getEndpointId(), 
+        CLUSTER_ID(UserLabel),                           // Cluster ID (0x0041)
+        ATTRIBUTE_ID(UserLabel, LabelList),   // Attribute ID (0x0000)
+        &initial_val
+    );
+    
+
+
 
 
     //MatterAttribute* attrSaturation = clusterColorControl->addAttribute(ATTRIBUTE_ID(ColorControl, CurrentSaturation),
