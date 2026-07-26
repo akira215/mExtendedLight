@@ -1,0 +1,16 @@
+{
+  "modelVersion": {
+    "vid": 65521,
+    "pid": 32768,
+    "softwareVersion": 2,
+    "softwareVersionString": "2.0.0",
+    "cdVersionNumber": 1,
+    "softwareVersionValid": true,
+    "otaUrl": "file:///mLightComponent_v2.ota",
+    "otaChecksum": "E3w0MMomKm127q9Bol9mY2qotxHLveT3hmzCu+/l88w=",
+    "otaChecksumType": 1,
+    "minApplicableSoftwareVersion": 1,
+    "maxApplicableSoftwareVersion": 1,
+    "releaseNotesUrl": ""
+  }
+}
